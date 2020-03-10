@@ -91,30 +91,34 @@ public class YerushaMetadataValidationPlugin implements IStepPluginVersion2 {
             List<Metadata> metatdaToValidate = new ArrayList<>();
 
             for (MetadataMappingObject mmo : config.getMetadataList()) {
-                boolean metadataExists = false;
+                Metadata metadata = null;
                 if (anchor != null && "anchor".equals(mmo.getDocType())) {
                     for (ugh.dl.Metadata md : anchor.getAllMetadata()) {
                         if (md.getType().getName().equals(mmo.getRulesetName())) {
                             metatdaToValidate.add(md);
-                            metadataExists = true;
+                            metadata = md;
                         }
                     }
                 } else {
                     for (ugh.dl.Metadata md : logical.getAllMetadata()) {
                         if (md.getType().getName().equals(mmo.getRulesetName())) {
                             metatdaToValidate.add(md);
-                            metadataExists = true;
+                            metadata = md;
                         }
                     }
                 }
-                if (!metadataExists) {
-                    Metadata md;
+                if (metadata== null) {
                     try {
-                        md = new Metadata(prefs.getMetadataTypeByName(mmo.getRulesetName()));
-                        metatdaToValidate.add(md);
+                        metadata = new Metadata(prefs.getMetadataTypeByName(mmo.getRulesetName()));
+                        metatdaToValidate.add(metadata);
                     } catch (MetadataTypeNotAllowedException e) {
                         log.error(e);
                     }
+                }
+                if (metadata != null) {
+                    mmo.setHeaderName(metadata.getType().getLanguage("en"));
+                } else {
+                    mmo.setHeaderName(mmo.getIdentifier());
                 }
             }
             for (MetadataMappingObject mmo : config.getMetadataList()) {
@@ -130,7 +134,7 @@ public class YerushaMetadataValidationPlugin implements IStepPluginVersion2 {
 
     private Metadatum validateMetadatum(List<Metadata> metatdaToValidate, MetadataMappingObject mmo) {
         Metadatum datum = new Metadatum();
-        datum.setHeadername(mmo.getIdentifier());
+        datum.setHeadername(mmo.getHeaderName());
         String value = null;
 
         for (Metadata md : metatdaToValidate) {

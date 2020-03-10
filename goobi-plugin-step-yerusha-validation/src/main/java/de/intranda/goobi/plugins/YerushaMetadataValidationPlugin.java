@@ -60,7 +60,7 @@ public class YerushaMetadataValidationPlugin implements IStepPluginVersion2 {
     private List<Metadatum> validationErrors ;
     @Override
     public void initialize(Step step, String returnPath) {
-        validationErrors = new ArrayList();
+        validationErrors = new ArrayList<>();
         this.step = step;
 
         XMLConfiguration xmlConfig = ConfigPlugins.getPluginConfig("intranda_workflow_excelimport");
@@ -239,13 +239,11 @@ public class YerushaMetadataValidationPlugin implements IStepPluginVersion2 {
 
     @Override
     public boolean execute() {
-        // TODO Auto-generated method stub
         return false;
     }
 
     @Override
     public PluginReturnValue run() {
-        // TODO Auto-generated method stub
         return null;
     }
 

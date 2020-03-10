@@ -26,6 +26,7 @@ import de.sub.goobi.config.ConfigPlugins;
 import de.sub.goobi.helper.exceptions.DAOException;
 import de.sub.goobi.helper.exceptions.SwapException;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
 import ugh.dl.DocStruct;
@@ -56,8 +57,13 @@ public class YerushaMetadataValidationPlugin implements IStepPluginVersion2 {
     private int interfaceVersion = 1;
 
     private Config config;
+
     @Getter
-    private List<Metadatum> validationErrors ;
+    private List<Metadatum> validationErrors;
+
+    @Getter @Setter
+    private String displayStatus = "up";
+
     @Override
     public void initialize(Step step, String returnPath) {
         validationErrors = new ArrayList<>();
@@ -107,7 +113,7 @@ public class YerushaMetadataValidationPlugin implements IStepPluginVersion2 {
                         }
                     }
                 }
-                if (metadata== null) {
+                if (metadata == null) {
                     try {
                         metadata = new Metadata(prefs.getMetadataTypeByName(mmo.getRulesetName()));
                         metatdaToValidate.add(metadata);
@@ -257,4 +263,7 @@ public class YerushaMetadataValidationPlugin implements IStepPluginVersion2 {
         return null;
     }
 
+    public void reload() {
+
+    }
 }

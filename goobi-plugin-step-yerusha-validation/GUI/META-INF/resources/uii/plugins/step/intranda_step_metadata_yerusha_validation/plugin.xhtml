@@ -7,7 +7,9 @@
     xmlns:x="http://myfaces.apache.org/tomahawk"
     xmlns:intranda="http://xmlns.jcp.org/jsf/composite/composites">
 
-<link rel="stylesheet" href="../../../css/excel_import.css"></link>
+    <link
+        rel="stylesheet"
+        href="../../../css/excel_import.css"></link>
 
     <h:form>
 
@@ -18,57 +20,105 @@
                     <i class="fa fa-puzzle-piece"></i>
                     <h:outputText value="#{msgs.plugin}: #{msgs.plugin_yerushaExcelImport_validationResults}" />
                 </h3>
+
+                <div class="actions">
+                    <h:commandLink
+                        styleClass="btn btn-mini"
+                        action="#{AktuelleSchritteForm.myPlugin.reload}"
+                        title="#{AktuelleSchritteForm.myPlugin.displayStatus eq 'up'?msgs.showBoxDetailsOn:msgs.showBoxDetailsOff}">
+                        <i class="fa #{AktuelleSchritteForm.myPlugin.displayStatus eq 'down'?'fa-angle-up':'fa-angle-down'}" />
+                        <f:setPropertyActionListener
+                            target="#{AktuelleSchritteForm.myPlugin.displayStatus}"
+                            value="#{AktuelleSchritteForm.myPlugin.displayStatus eq 'down'?'up':'down'}" />
+                    </h:commandLink>
+                </div>
             </div>
 
 
             <div class="box-content nopadding">
 
-     
-<table class="table table-hover table-nomargin dataTable table-bordered responsive" style="margin-bottom:15px;">
-                                            <ui:repeat var="metadatum" value="#{AktuelleSchritteForm.myPlugin.validationErrors}">
-                                                
-                                              
-                                                    <tr>
-                                                        <td class="tableColumnOverflow width200">
-                                                            
-                                                            <h:outputText styleClass="#{metadatum.value==''?'font-light':'font-black'}"
-                                                                value="#{metadatum.headername}:" rendered="#{metadatum.valid}"/>
-                                                            
-                                                            
-                                                            <h:outputText rendered="#{!metadatum.valid}"
-                                                                styleClass="font-danger"
-                                                                value="#{metadatum.headername}:">
-                                                                <f:passThroughAttribute name="data-trigger" value="hover" />
-                                                                <f:passThroughAttribute name="data-container" value="body" />
-                                                                <f:passThroughAttribute name="data-toggle" value="popover" />
-                                                                <f:passThroughAttribute name="data-placement" value="top" />
-                                                                <f:passThroughAttribute name="data-html" value="true" />
-                                                                <f:passThroughAttribute name="data-content" value="&lt;b class='font-status-error'&gt;#{msgs.plugin_yerushaExcelImport_validationError}:&lt;/b&gt;&lt;br/&gt;#{metadatum.errorMessagesAsHtml}" />
-                                                            </h:outputText>
-                                                            
-                                                                                                        
-                                                        </td>
-                                                        <td>
-                                                        
-                                                            <h:outputText styleClass="#{metadatum.value==''?'font-light':'font-black'}"
-                                                                value="#{metadatum.value==''?'- empty field -':metadatum.value}" rendered="#{metadatum.valid}"/>
-                                                            
-                                                            <h:outputText rendered="#{!metadatum.valid}"
-                                                                styleClass="font-danger"
-                                                                value="#{metadatum.value==''?'- empty field -':metadatum.value}">
-                                                                <f:passThroughAttribute name="data-trigger" value="hover" />
-                                                                <f:passThroughAttribute name="data-container" value="body" />
-                                                                <f:passThroughAttribute name="data-toggle" value="popover" />
-                                                                <f:passThroughAttribute name="data-placement" value="top" />
-                                                                <f:passThroughAttribute name="data-html" value="true" />
-                                                                <f:passThroughAttribute name="data-content" value="&lt;b class='font-status-error'&gt;#{msgs.plugin_yerushaExcelImport_validationError}:&lt;/b&gt;&lt;br/&gt;#{metadatum.errorMessagesAsHtml}" />
-                                                            </h:outputText>
-                                                        
-                                                        </td>
-                                                    </tr>
-                                            </ui:repeat>    
-                                        </table>     
-     
+
+                <table
+                    class="table table-hover table-nomargin dataTable table-bordered responsive"
+                    style="margin-bottom: 15px;">
+                    <ui:repeat
+                        var="metadatum"
+                        value="#{AktuelleSchritteForm.myPlugin.validationErrors}">
+
+                        <ui:fragment rendered="#{AktuelleSchritteForm.myPlugin.displayStatus eq 'down' or !metadatum.valid}">
+                            <tr>
+                                <td class="tableColumnOverflow width200">
+
+                                    <h:outputText
+                                        styleClass="#{metadatum.value==''?'font-light':'font-black'}"
+                                        value="#{metadatum.headername}:"
+                                        rendered="#{metadatum.valid}" />
+
+
+                                    <h:outputText
+                                        rendered="#{!metadatum.valid}"
+                                        styleClass="font-danger"
+                                        value="#{metadatum.headername}:">
+                                        <f:passThroughAttribute
+                                            name="data-trigger"
+                                            value="hover" />
+                                        <f:passThroughAttribute
+                                            name="data-container"
+                                            value="body" />
+                                        <f:passThroughAttribute
+                                            name="data-toggle"
+                                            value="popover" />
+                                        <f:passThroughAttribute
+                                            name="data-placement"
+                                            value="top" />
+                                        <f:passThroughAttribute
+                                            name="data-html"
+                                            value="true" />
+                                        <f:passThroughAttribute
+                                            name="data-content"
+                                            value="&lt;b class='font-status-error'&gt;#{msgs.plugin_yerushaExcelImport_validationError}:&lt;/b&gt;&lt;br/&gt;#{metadatum.errorMessagesAsHtml}" />
+                                    </h:outputText>
+
+
+                                </td>
+                                <td>
+
+                                    <h:outputText
+                                        styleClass="#{metadatum.value==''?'font-light':'font-black'}"
+                                        value="#{metadatum.value==''?'- empty field -':metadatum.value}"
+                                        rendered="#{metadatum.valid}" />
+
+                                    <h:outputText
+                                        rendered="#{!metadatum.valid}"
+                                        styleClass="font-danger"
+                                        value="#{metadatum.value==''?'- empty field -':metadatum.value}">
+                                        <f:passThroughAttribute
+                                            name="data-trigger"
+                                            value="hover" />
+                                        <f:passThroughAttribute
+                                            name="data-container"
+                                            value="body" />
+                                        <f:passThroughAttribute
+                                            name="data-toggle"
+                                            value="popover" />
+                                        <f:passThroughAttribute
+                                            name="data-placement"
+                                            value="top" />
+                                        <f:passThroughAttribute
+                                            name="data-html"
+                                            value="true" />
+                                        <f:passThroughAttribute
+                                            name="data-content"
+                                            value="&lt;b class='font-status-error'&gt;#{msgs.plugin_yerushaExcelImport_validationError}:&lt;/b&gt;&lt;br/&gt;#{metadatum.errorMessagesAsHtml}" />
+                                    </h:outputText>
+
+                                </td>
+                            </tr>
+
+                        </ui:fragment>
+                    </ui:repeat>
+                </table>
+
 
 
 

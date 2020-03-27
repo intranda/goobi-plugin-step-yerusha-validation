@@ -66,8 +66,12 @@ public class YerushaMetadataValidationPlugin implements IStepPluginVersion2 {
 
     @Override
     public void initialize(Step step, String returnPath) {
+    	this.step = step;
+    	runValidation();
+    }
+
+    private void runValidation() {
         validationErrors = new ArrayList<>();
-        this.step = step;
 
         XMLConfiguration xmlConfig = ConfigPlugins.getPluginConfig("intranda_workflow_excelimport");
         xmlConfig.setExpressionEngine(new XPathExpressionEngine());
@@ -134,11 +138,10 @@ public class YerushaMetadataValidationPlugin implements IStepPluginVersion2 {
 
         } catch (ReadException | PreferencesException | WriteException | IOException | InterruptedException | SwapException | DAOException e) {
             log.error(e);
-        }
+        }	
+	}
 
-    }
-
-    private Metadatum validateMetadatum(List<Metadata> metatdaToValidate, MetadataMappingObject mmo) {
+	private Metadatum validateMetadatum(List<Metadata> metatdaToValidate, MetadataMappingObject mmo) {
         Metadatum datum = new Metadatum();
         datum.setHeadername(mmo.getHeaderName());
         String value = null;
@@ -264,6 +267,6 @@ public class YerushaMetadataValidationPlugin implements IStepPluginVersion2 {
     }
 
     public void reload() {
-
+    	runValidation();
     }
 }

@@ -25,11 +25,8 @@
                     <h:commandLink
                         styleClass="btn btn-mini"
                         action="#{AktuelleSchritteForm.myPlugin.reload}"
-                        title="#{AktuelleSchritteForm.myPlugin.displayStatus eq 'up'?msgs.showBoxDetailsOn:msgs.showBoxDetailsOff}">
-                        <i class="fa #{AktuelleSchritteForm.myPlugin.displayStatus eq 'down'?'fa-angle-up':'fa-angle-down'}" />
-                        <f:setPropertyActionListener
-                            target="#{AktuelleSchritteForm.myPlugin.displayStatus}"
-                            value="#{AktuelleSchritteForm.myPlugin.displayStatus eq 'down'?'up':'down'}" />
+                        title="#{msgs.plugin_yerushaExcelImport_executeValidationAgain}">
+                        <i class="fa fa-refresh" />
                     </h:commandLink>
                 </div>
             </div>

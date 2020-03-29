@@ -133,7 +133,9 @@ public class YerushaMetadataValidationPlugin implements IStepPluginVersion2 {
             }
             for (MetadataMappingObject mmo : config.getMetadataList()) {
                 Metadatum metadatum = validateMetadatum(metatdaToValidate, mmo);
-                validationErrors.add(metadatum);
+                if (!metadatum.isValid()) {
+                	validationErrors.add(metadatum);
+                }
             }
 
         } catch (ReadException | PreferencesException | WriteException | IOException | InterruptedException | SwapException | DAOException e) {

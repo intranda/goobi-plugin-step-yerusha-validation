@@ -150,7 +150,7 @@ public class YerushaMetadataValidationPlugin implements IStepPluginVersion2 {
 
         for (Metadata md : metatdaToValidate) {
             if (md.getType().getName().equals(mmo.getRulesetName())) {
-                value = md.getValue();
+                value = md.getValue().trim();
             }
         }
         if (StringUtils.isBlank(value)) {

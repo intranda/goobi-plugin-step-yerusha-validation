@@ -150,13 +150,14 @@ public class YerushaMetadataValidationPlugin implements IStepPluginVersion2 {
 
         for (Metadata md : metatdaToValidate) {
             if (md.getType().getName().equals(mmo.getRulesetName())) {
-                value = md.getValue().trim();
+                value = md.getValue();
             }
         }
         if (StringUtils.isBlank(value)) {
             value = "";
         }
         value = value.replaceAll("¶", "<br/><br/>");
+        value = value.replaceAll("\\u00A0|\\u2007|\\u202F", " ").trim();
         datum.setValue(value);
         // check if value is empty but required
         if (mmo.isRequired()) {
@@ -271,4 +272,14 @@ public class YerushaMetadataValidationPlugin implements IStepPluginVersion2 {
     public void reload() {
     	runValidation();
     }
+
+    public static void main(String[] args) {
+    	String value = "tsdavo@archives.gov.ua ";
+    	value = value.replaceAll("\\u00A0|\\u2007|\\u202F", " ").trim();
+    	
+//    	value = value.trim();
+//	  	value = value.replaceAll("\\u00A0","");
+	  	System.out.println( "-" + value + "-");
+    }
+  	
 }

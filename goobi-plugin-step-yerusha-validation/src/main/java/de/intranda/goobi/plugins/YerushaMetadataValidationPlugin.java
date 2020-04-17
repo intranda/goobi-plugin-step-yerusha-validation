@@ -72,7 +72,7 @@ public class YerushaMetadataValidationPlugin implements IStepPluginVersion2 {
     }
 
     private void runValidation() {
-
+        validationErrors = new ArrayList<>();
         XMLConfiguration xmlConfig = ConfigPlugins.getPluginConfig("intranda_workflow_excelimport");
         xmlConfig.setExpressionEngine(new XPathExpressionEngine());
         xmlConfig.setReloadingStrategy(new FileChangedReloadingStrategy());

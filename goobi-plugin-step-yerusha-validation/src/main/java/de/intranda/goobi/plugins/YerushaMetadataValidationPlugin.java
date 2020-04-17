@@ -61,13 +61,17 @@ public class YerushaMetadataValidationPlugin implements IStepPluginVersion2 {
     @Getter
     private List<Metadatum> validationErrors;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private String displayStatus = "up";
 
     @Override
     public void initialize(Step step, String returnPath) {
-        validationErrors = new ArrayList<>();
         this.step = step;
+        runValidation();
+    }
+
+    private void runValidation() {
 
         XMLConfiguration xmlConfig = ConfigPlugins.getPluginConfig("intranda_workflow_excelimport");
         xmlConfig.setExpressionEngine(new XPathExpressionEngine());
@@ -128,15 +132,18 @@ public class YerushaMetadataValidationPlugin implements IStepPluginVersion2 {
                 }
             }
 
-
             for (MetadataMappingObject mmo : config.getMetadataList()) {
-                List<MetadataMappingObject> mmoSubList=getSublistForMetadata(mmo.getRulesetName());
+                List<MetadataMappingObject> mmoSubList = getSublistForMetadata(mmo.getRulesetName());
                 int occurrence = 0;
-                if (mmoSubList.size()>1) {
-                    occurrence=  mmoSubList.indexOf(mmo) +1;
+                if (mmoSubList.size() > 1) {
+                    occurrence = mmoSubList.indexOf(mmo) + 1;
                 }
-                List<Metadatum> metadatum = validateMetadatum(metatdaToValidate, mmo, occurrence);
-                validationErrors.addAll(metadatum);
+                List<Metadatum> metadatavalidationResults = validateMetadatum(metatdaToValidate, mmo, occurrence);
+                for (Metadatum metadatum : metadatavalidationResults) {
+                    if (!metadatum.isValid()) {
+                        validationErrors.add(metadatum);
+                    }
+                }
             }
 
         } catch (ReadException | PreferencesException | WriteException | IOException | InterruptedException | SwapException | DAOException e) {
@@ -151,10 +158,10 @@ public class YerushaMetadataValidationPlugin implements IStepPluginVersion2 {
         int counter = 1;
         for (Metadata md : metatdaToValidate) {
             if (md.getType().getName().equals(mmo.getRulesetName())) {
-                if (occurrence ==0 || counter==occurrence) {
+                if (occurrence == 0 || counter == occurrence) {
                     values.add(md.getValue());
                 }
-                counter ++;
+                counter++;
             }
         }
         if (values.isEmpty()) {
@@ -164,10 +171,11 @@ public class YerushaMetadataValidationPlugin implements IStepPluginVersion2 {
             Metadatum datum = new Metadatum();
             datum.setHeadername(mmo.getHeaderName());
             validationResults.add(datum);
-            if (value== null) {
+            if (value == null) {
                 value = "";
             }
             value = value.replaceAll("¶", "<br/><br/>");
+            value = value.replaceAll("\\u00A0|\\u2007|\\u202F", " ").trim();
             datum.setValue(value);
             // check if value is empty but required
             if (mmo.isRequired()) {
@@ -282,7 +290,16 @@ public class YerushaMetadataValidationPlugin implements IStepPluginVersion2 {
     }
 
     public void reload() {
+        runValidation();
+    }
 
+    public static void main(String[] args) {
+        String value = "tsdavo@archives.gov.ua ";
+        value = value.replaceAll("\\u00A0|\\u2007|\\u202F", " ").trim();
+
+        //      value = value.trim();
+        //      value = value.replaceAll("\\u00A0","");
+        System.out.println("-" + value + "-");
     }
 
     private List<MetadataMappingObject> getSublistForMetadata(String metadataname) {

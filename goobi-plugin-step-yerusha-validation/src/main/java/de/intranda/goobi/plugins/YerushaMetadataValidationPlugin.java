@@ -61,18 +61,18 @@ public class YerushaMetadataValidationPlugin implements IStepPluginVersion2 {
     @Getter
     private List<Metadatum> validationErrors;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private String displayStatus = "up";
 
     @Override
     public void initialize(Step step, String returnPath) {
-    	this.step = step;
-    	runValidation();
+        this.step = step;
+        runValidation();
     }
 
     private void runValidation() {
         validationErrors = new ArrayList<>();
-
         XMLConfiguration xmlConfig = ConfigPlugins.getPluginConfig("intranda_workflow_excelimport");
         xmlConfig.setExpressionEngine(new XPathExpressionEngine());
         xmlConfig.setReloadingStrategy(new FileChangedReloadingStrategy());
@@ -131,112 +131,132 @@ public class YerushaMetadataValidationPlugin implements IStepPluginVersion2 {
                     mmo.setHeaderName(mmo.getIdentifier());
                 }
             }
+
             for (MetadataMappingObject mmo : config.getMetadataList()) {
-                Metadatum metadatum = validateMetadatum(metatdaToValidate, mmo);
-                if (!metadatum.isValid()) {
-                	validationErrors.add(metadatum);
+                List<MetadataMappingObject> mmoSubList = getSublistForMetadata(mmo.getRulesetName());
+                int occurrence = 0;
+                if (mmoSubList.size() > 1) {
+                    occurrence = mmoSubList.indexOf(mmo) + 1;
+                }
+                List<Metadatum> metadatavalidationResults = validateMetadatum(metatdaToValidate, mmo, occurrence);
+                for (Metadatum metadatum : metadatavalidationResults) {
+                    if (!metadatum.isValid()) {
+                        validationErrors.add(metadatum);
+                    }
                 }
             }
 
         } catch (ReadException | PreferencesException | WriteException | IOException | InterruptedException | SwapException | DAOException e) {
             log.error(e);
-        }	
-	}
+        }
 
-	private Metadatum validateMetadatum(List<Metadata> metatdaToValidate, MetadataMappingObject mmo) {
-        Metadatum datum = new Metadatum();
-        datum.setHeadername(mmo.getHeaderName());
-        String value = null;
+    }
 
+    private List<Metadatum> validateMetadatum(List<Metadata> metatdaToValidate, MetadataMappingObject mmo, int occurrence) {
+        List<Metadatum> validationResults = new ArrayList<>();
+        List<String> values = new ArrayList<>();
+        int counter = 1;
         for (Metadata md : metatdaToValidate) {
             if (md.getType().getName().equals(mmo.getRulesetName())) {
-                value = md.getValue();
+                if (occurrence == 0 || counter == occurrence) {
+                    values.add(md.getValue());
+                }
+                counter++;
             }
         }
-        if (StringUtils.isBlank(value)) {
-            value = "";
+        if (values.isEmpty()) {
+            values.add("");
         }
-        value = value.replaceAll("¶", "<br/><br/>");
-        value = value.replaceAll("\\u00A0|\\u2007|\\u202F", " ").trim();
-        datum.setValue(value);
-        // check if value is empty but required
-        if (mmo.isRequired()) {
-            if (value == null || value.isEmpty()) {
-                datum.setValid(false);
-                datum.getErrorMessages().add(mmo.getRequiredErrorMessage());
+        for (String value : values) {
+            Metadatum datum = new Metadatum();
+            datum.setHeadername(mmo.getHeaderName());
+            validationResults.add(datum);
+            if (value == null) {
+                value = "";
             }
-        }
-        // check if value matches the configured pattern
-        if (mmo.getPattern() != null && value != null && !value.isEmpty()) {
-            Pattern pattern = mmo.getPattern();
-            Matcher matcher = pattern.matcher(value);
-            if (!matcher.find()) {
-                datum.setValid(false);
-                datum.getErrorMessages().add(mmo.getPatternErrorMessage());
-            }
-        }
-        // checks whether all parts of value are in the list of controlled contents
-        if (!(mmo.getValidContent().isEmpty() || value == null || value.isEmpty())) {
-            String[] valueList = value.split("; ");
-            for (String v : valueList) {
-                if (!mmo.getValidContent().contains(v)) {
+            value = value.replaceAll("¶", "<br/><br/>");
+            value = value.replaceAll("\\u00A0|\\u2007|\\u202F", " ").trim();
+            datum.setValue(value);
+            // check if value is empty but required
+            if (mmo.isRequired()) {
+                if (value == null || value.isEmpty()) {
                     datum.setValid(false);
-                    datum.getErrorMessages().add(mmo.getValidContentErrorMessage());
+                    datum.getErrorMessages().add(mmo.getRequiredErrorMessage());
                 }
             }
-        }
-        // check if a configured requirement of either field having content is
-        // fulfilled
-        if (!mmo.getEitherHeader().isEmpty()) {
-            Metadata eitherMetadata = null;
-            for (MetadataMappingObject other : config.getMetadataList()) {
-                if (other.getIdentifier().equals(mmo.getEitherHeader())) {
-                    for (Metadata md : metatdaToValidate) {
-                        if (md.getType().getName().equals(other.getRulesetName())) {
-                            eitherMetadata = md;
-                            break;
-                        }
+            // check if value matches the configured pattern
+            if (mmo.getPattern() != null && value != null && !value.isEmpty()) {
+                Pattern pattern = mmo.getPattern();
+                Matcher matcher = pattern.matcher(value);
+                if (!matcher.find()) {
+                    datum.setValid(false);
+                    datum.getErrorMessages().add(mmo.getPatternErrorMessage());
+                }
+            }
+            // checks whether all parts of value are in the list of controlled contents
+            if (!(mmo.getValidContent().isEmpty() || value == null || value.isEmpty())) {
+                String[] valueList = value.split("; ");
+                for (String v : valueList) {
+                    if (!mmo.getValidContent().contains(v)) {
+                        datum.setValid(false);
+                        datum.getErrorMessages().add(mmo.getValidContentErrorMessage());
                     }
                 }
             }
 
-            if ((eitherMetadata == null || StringUtils.isBlank(eitherMetadata.getValue())) && value.isEmpty()) {
-                datum.setValid(false);
-                datum.getErrorMessages().add(mmo.getEitherErrorMessage());
-            }
-        }
-        // check if field has content despite required field not having content
-        if (!mmo.getRequiredHeaders()[0].isEmpty()) {
-            for (String requiredHeader : mmo.getRequiredHeaders()) {
-                Metadata requiredMetadata = null;
+            // check if a configured requirement of either field having content is
+            // fulfilled
+            if (!mmo.getEitherHeader().isEmpty()) {
+                Metadata eitherMetadata = null;
                 for (MetadataMappingObject other : config.getMetadataList()) {
-                    if (other.getIdentifier().equals(requiredHeader)) {
+                    if (other.getIdentifier().equals(mmo.getEitherHeader())) {
                         for (Metadata md : metatdaToValidate) {
                             if (md.getType().getName().equals(other.getRulesetName())) {
-                                requiredMetadata = md;
+                                eitherMetadata = md;
                                 break;
                             }
                         }
                     }
                 }
 
-                if ((requiredMetadata == null || StringUtils.isBlank(requiredMetadata.getValue())) && !value.isEmpty()) {
+                if ((eitherMetadata == null || StringUtils.isBlank(eitherMetadata.getValue())) && value.isEmpty()) {
                     datum.setValid(false);
-                    if (!datum.getErrorMessages().contains(mmo.getRequiredHeadersErrormessage())) {
-                        datum.getErrorMessages().add(mmo.getRequiredHeadersErrormessage());
+                    datum.getErrorMessages().add(mmo.getEitherErrorMessage());
+                }
+            }
+            // check if field has content despite required field not having content
+            if (!mmo.getRequiredHeaders()[0].isEmpty()) {
+                for (String requiredHeader : mmo.getRequiredHeaders()) {
+                    Metadata requiredMetadata = null;
+                    for (MetadataMappingObject other : config.getMetadataList()) {
+                        if (other.getIdentifier().equals(requiredHeader)) {
+                            for (Metadata md : metatdaToValidate) {
+                                if (md.getType().getName().equals(other.getRulesetName())) {
+                                    requiredMetadata = md;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+
+                    if ((requiredMetadata == null || StringUtils.isBlank(requiredMetadata.getValue())) && !value.isEmpty()) {
+                        datum.setValid(false);
+                        if (!datum.getErrorMessages().contains(mmo.getRequiredHeadersErrormessage())) {
+                            datum.getErrorMessages().add(mmo.getRequiredHeadersErrormessage());
+                        }
                     }
                 }
             }
-        }
-        //check if field has the demanded wordcount
-        if (mmo.getWordcount() != 0) {
-            String[] wordArray = value.split(" ");
-            if (wordArray.length < mmo.getWordcount()) {
-                datum.setValid(false);
-                datum.getErrorMessages().add(mmo.getWordcountErrormessage());
+            //check if field has the demanded wordcount
+            if (mmo.getWordcount() != 0) {
+                String[] wordArray = value.split(" ");
+                if (wordArray.length < mmo.getWordcount()) {
+                    datum.setValid(false);
+                    datum.getErrorMessages().add(mmo.getWordcountErrormessage());
+                }
             }
         }
-        return datum;
+        return validationResults;
     }
 
     @Override
@@ -270,16 +290,25 @@ public class YerushaMetadataValidationPlugin implements IStepPluginVersion2 {
     }
 
     public void reload() {
-    	runValidation();
+        runValidation();
     }
 
     public static void main(String[] args) {
-    	String value = "tsdavo@archives.gov.ua ";
-    	value = value.replaceAll("\\u00A0|\\u2007|\\u202F", " ").trim();
-    	
-//    	value = value.trim();
-//	  	value = value.replaceAll("\\u00A0","");
-	  	System.out.println( "-" + value + "-");
+        String value = "tsdavo@archives.gov.ua ";
+        value = value.replaceAll("\\u00A0|\\u2007|\\u202F", " ").trim();
+
+        //      value = value.trim();
+        //      value = value.replaceAll("\\u00A0","");
+        System.out.println("-" + value + "-");
     }
-  	
+
+    private List<MetadataMappingObject> getSublistForMetadata(String metadataname) {
+        List<MetadataMappingObject> returnlist = new ArrayList<>();
+        for (MetadataMappingObject mmo : config.getMetadataList()) {
+            if (mmo.getRulesetName().equals(metadataname)) {
+                returnlist.add(mmo);
+            }
+        }
+        return returnlist;
+    }
 }

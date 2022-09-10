@@ -8,7 +8,7 @@
   <url>http://maven.apache.org</url>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <goobi.version>22.08</goobi.version>
+    <goobi.version>22.08.1</goobi.version>
   </properties>
   <modules>
     <module>module-main</module>
@@ -26,9 +26,9 @@
       <url>https://nexus.intranda.com/repository/maven-public</url>
     </repository>
     <repository>
-	  <id>intranda-internal</id>
-	  <url>https://nexus.intranda.com/repository/maven-internal</url>
-  </repository>
+      <id>intranda-internal</id>
+      <url>https://nexus.intranda.com/repository/maven-internal</url>
+    </repository>
   </repositories>
   <dependencies>
     <dependency>

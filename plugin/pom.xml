@@ -59,7 +59,7 @@
     <dependency>
       <groupId>de.intranda.goobi.plugins.workflow</groupId>
       <artifactId>excelimport-gui</artifactId>
-      <version>1.0.2-SNAPSHOT</version>
+      <version>23.07.1</version>
     </dependency>
   </dependencies>
 </project>

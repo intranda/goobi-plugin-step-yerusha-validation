@@ -3,6 +3,10 @@ title: Metadata validation within a task
 identifier: intranda_step_metadata_yerusha_validation
 published: true
 description: This plugin displays the results of a validation of metadata within an accepted task.
+keywords:
+    - Goobi workflow
+    - Plugin
+    - Step Plugin
 ---
 ## Introduction
 This plug-in is used to validate metadata from the Goobi METS file and visualise the validation results within an accepted task. The way the plugin works requires a configuration file of the type required for the following workflow plugin: [Generic import plugin for Excel files including validation](https://docs.goobi.io/goobi-workflow-plugins-en/workflow-plugins/goobi-plugin-workflow-excelimport).

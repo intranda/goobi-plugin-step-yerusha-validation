@@ -9,7 +9,7 @@ keywords:
     - Step Plugin
 ---
 ## Einführung
-Diese Plugin dient zur Validierung von Metadaten aus der Goobi-METS-Datei und visualisiert die Validierungsergebnisse innerhalb einer angenommenen Aufgabe. Die Arbeitsweise des Plugins setzt voraus, dass eine Konfigurationsdatei vorhanden ist, wie sie für das folgende Workflow-Plugin benötigt wird: [Generisches Import Plugin für Excel-Dateien inklusive Validierung](https://docs.goobi.io/goobi-workflow-plugins-de/workflow-plugins/goobi-plugin-workflow-excelimport).
+Dieses Plugin dient zur Validierung von Metadaten aus der Goobi-METS-Datei und visualisiert die Validierungsergebnisse innerhalb einer angenommenen Aufgabe. Die Arbeitsweise des Plugins setzt voraus, dass eine Konfigurationsdatei vorhanden ist, wie sie für das folgende Workflow-Plugin benötigt wird: [Generisches Import Plugin für Excel-Dateien inklusive Validierung](https://docs.goobi.io/goobi-workflow-plugins-de/workflow-plugins/goobi-plugin-workflow-excelimport).
 
 
 ## Installation

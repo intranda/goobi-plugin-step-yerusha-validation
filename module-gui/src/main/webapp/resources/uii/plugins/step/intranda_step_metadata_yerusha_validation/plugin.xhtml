@@ -6,14 +6,15 @@
     xmlns:h="http://java.sun.com/jsf/html"
     xmlns:intranda="http://xmlns.jcp.org/jsf/composite/compositesPG"
 	xmlns:section="http://goobi.io/section"
-	xmlns:table="http://goobi.ui/table">
+	xmlns:table="http://goobi.ui/table"
+	xmlns:util="http://goobi.io/util">
     <link
         rel="stylesheet"
         href="../../../css/excel_import.css"></link>
     <h:form>
 		<section:section type="neutral">
 			<section:header
-				icon="puzzle-piece"
+				icon="puzzle"
 				title="#{msgs.plugin}: #{msgs.plugin_yerushaExcelImport_validationResults}">
 				<section:header-actions>
 					<button
@@ -22,7 +23,7 @@
 						title="#{msgs.plugin_yerushaExcelImport_executeValidationAgain}"
 						type="button"
 						data-bs-toggle="tooltip">
-						<span class="fa fa-refresh" aria-hidden="true"/>
+						<util:icon icon="refresh" />
 					</button>
 				</section:header-actions>
 			</section:header>
